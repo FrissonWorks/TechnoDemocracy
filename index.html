@@ -286,7 +286,8 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // Use your domain as namespace to avoid collisions.
+      // Namespace + key for CountAPI
+      // (Keep these stable if you want the count to persist.)
       const NAMESPACE = "technodemocracy.world";
       const KEY = "visits";
       const BASE = "https://api.countapi.xyz";
@@ -310,50 +311,86 @@
       async function fetchJson(url, timeoutMs) {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), timeoutMs);
+
         try {
           const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
+          if (!res.ok) {
+            const err = new Error("HTTP " + res.status);
+            err.status = res.status;
+            throw err;
+          }
           return await res.json();
         } finally {
           clearTimeout(t);
         }
       }
 
-      // Show cached value immediately (so it never feels broken).
-      const cached = Number(localStorage.getItem(LS_LAST_VALUE));
-      if (Number.isFinite(cached)) setDisplay(format(cached));
+      // LocalStorage can throw in some privacy modes; keep it safe.
+      function lsGet(key) {
+        try { return localStorage.getItem(key); } catch { return null; }
+      }
+      function lsSet(key, value) {
+        try { localStorage.setItem(key, value); } catch {}
+      }
+
+      // Show cached value immediately (avoid “feels broken”).
+      const cachedRaw = lsGet(LS_LAST_VALUE);
+      const cached = Number(cachedRaw);
+
+      // Don't “lock in” a cached 0 forever — treat it like "unknown".
+      if (Number.isFinite(cached) && cached > 0) setDisplay(format(cached));
       else setDisplay("…");
 
       const now = Date.now();
-      const lastHit = Number(localStorage.getItem(LS_LAST_HIT)) || 0;
+      const lastHit = Number(lsGet(LS_LAST_HIT)) || 0;
       const shouldHit = (now - lastHit) > HIT_COOLDOWN_MS;
 
       const ns = encodeURIComponent(NAMESPACE);
       const key = encodeURIComponent(KEY);
 
-      const url = shouldHit
-        ? `${BASE}/hit/${ns}/${key}`
-        : `${BASE}/get/${ns}/${key}`;
+      const getUrl = `${BASE}/get/${ns}/${key}`;
+      const hitUrl = `${BASE}/hit/${ns}/${key}`;
 
-      // Optional: show intent while loading if no cache.
-      if (!Number.isFinite(cached)) setDisplay("loading…");
+      // If no good cache, show loading state.
+      if (!(Number.isFinite(cached) && cached > 0)) setDisplay("loading…");
 
-      fetchJson(url, 7000)
-        .then((data) => {
+      (async () => {
+        try {
+          let data;
+
+          if (shouldHit) {
+            // Normal path: count once per cooldown window.
+            data = await fetchJson(hitUrl, 7000);
+            lsSet(LS_LAST_HIT, String(now));
+          } else {
+            // Cooldown path: try GET, but if the counter doesn't exist yet (404),
+            // do ONE HIT to create it.
+            try {
+              data = await fetchJson(getUrl, 7000);
+            } catch (err) {
+              if (err && err.status === 404) {
+                data = await fetchJson(hitUrl, 7000);
+                lsSet(LS_LAST_HIT, String(now));
+              } else {
+                throw err;
+              }
+            }
+          }
+
           const value = Number(data && data.value);
           if (!Number.isFinite(value)) throw new Error("Bad payload");
 
           setDisplay(format(value));
-          localStorage.setItem(LS_LAST_VALUE, String(value));
-
-          if (shouldHit) localStorage.setItem(LS_LAST_HIT, String(now));
-        })
-        .catch(() => {
-          // Keep cached if we have it; otherwise show a clear “offline” state.
-          const stillCached = Number(localStorage.getItem(LS_LAST_VALUE));
-          if (Number.isFinite(stillCached)) setDisplay(format(stillCached), "Counter temporarily unavailable");
-          else setDisplay("—", "Counter temporarily unavailable");
-        });
+          if (value > 0) lsSet(LS_LAST_VALUE, String(value));
+        } catch (e) {
+          const fallback = Number(lsGet(LS_LAST_VALUE));
+          if (Number.isFinite(fallback) && fallback > 0) {
+            setDisplay(format(fallback), "Counter temporarily unavailable");
+          } else {
+            setDisplay("—", "Counter temporarily unavailable");
+          }
+        }
+      })();
     })();
   </script>
 </body>
