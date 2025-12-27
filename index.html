@@ -7,7 +7,6 @@
   <!-- Hide from search engines for now -->
   <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta name="googlebot" content="noindex, nofollow" />
-  <!-- Helps if anything ever accidentally uses http:// -->
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
   <style>
@@ -204,9 +203,6 @@
       main { max-height: none; }
     }
   </style>
-
-  <!-- CounterAPI official JS client via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/counterapi/dist/counter.browser.min.js"></script>
 </head>
 
 <body>
@@ -289,30 +285,25 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // ✅ Stable CounterAPI client (V1, no auth)
-      // Docs: create V1 client with namespace; use .get() and .up() :contentReference[oaicite:1]{index=1}
-      if (typeof Counter !== "function") {
-        el.textContent = "—";
-        el.title = "Counter library blocked (CDN)";
-        return;
-      }
+      // ✅ CounterAPI (no CDN needed)
+      const BASE = "https://api.counterapi.dev/v1";
 
-      // Use your actual domain as namespace to avoid collisions.
-      const counterClient = new Counter({
-        version: "v1",
-        namespace: "technodemocracy.world",
-        timeout: 8000,
-        debug: false
-      });
-
-      // Counter name (you can make it per-page later if you want)
+      // Keep these SIMPLE (letters/numbers only = safest everywhere)
+      const NAMESPACE = "technodemocracyworld";
       const KEY = "opens";
 
       // Count max once per 12h per browser
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
-      const LS_LAST_HIT = "td_counter_last_hit_v4";
-      const LS_LAST_VALUE = "td_counter_last_value_v4";
+      const LS_LAST_HIT = "td_counter_last_hit_v5";
+      const LS_LAST_VALUE = "td_counter_last_value_v5";
+
+      function safeGet(key) {
+        try { return localStorage.getItem(key); } catch { return null; }
+      }
+      function safeSet(key, value) {
+        try { localStorage.setItem(key, value); } catch {}
+      }
 
       function format(n) {
         try { return new Intl.NumberFormat("en-GB").format(n); }
@@ -324,31 +315,47 @@
         if (note) el.setAttribute("title", note);
       }
 
+      async function fetchJson(url, timeoutMs) {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return await res.json();
+        } finally {
+          clearTimeout(t);
+        }
+      }
+
       // Show cached value immediately
-      const cached = Number(localStorage.getItem(LS_LAST_VALUE));
+      const cached = Number(safeGet(LS_LAST_VALUE));
       if (Number.isFinite(cached)) setDisplay(format(cached));
-      else setDisplay("…");
+      else setDisplay("loading…");
 
       const now = Date.now();
-      const lastHit = Number(localStorage.getItem(LS_LAST_HIT)) || 0;
-      const shouldHit = (now - lastHit) > HIT_COOLDOWN_MS;
+      const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
 
-      // Optional: show loading only if no cache
-      if (!Number.isFinite(cached)) setDisplay("loading…");
+      // Optional force hit for testing: add ?forcehit=1 to URL
+      const forceHit = new URLSearchParams(location.search).get("forcehit") === "1";
 
-      const op = shouldHit ? counterClient.up(KEY) : counterClient.get(KEY);
+      const shouldHit = forceHit || (now - lastHit) > HIT_COOLDOWN_MS;
 
-      op.then((data) => {
+      const url = shouldHit
+        ? `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}/up`
+        : `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`;
+
+      fetchJson(url, 8000)
+        .then((data) => {
           const value = Number(data && data.value);
           if (!Number.isFinite(value)) throw new Error("Bad payload");
 
           setDisplay(format(value));
-          localStorage.setItem(LS_LAST_VALUE, String(value));
-          if (shouldHit) localStorage.setItem(LS_LAST_HIT, String(now));
+          safeSet(LS_LAST_VALUE, String(value));
+          if (shouldHit) safeSet(LS_LAST_HIT, String(now));
         })
         .catch((err) => {
           console.warn("Counter failed:", err);
-          const stillCached = Number(localStorage.getItem(LS_LAST_VALUE));
+          const stillCached = Number(safeGet(LS_LAST_VALUE));
           if (Number.isFinite(stillCached)) setDisplay(format(stillCached), "Counter temporarily unavailable");
           else setDisplay("—", "Counter temporarily unavailable");
         });
