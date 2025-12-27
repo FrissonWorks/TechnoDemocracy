@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <title>TechnoDemocracy – Early Manifesto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Hide from search engines for now -->
   <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta name="googlebot" content="noindex, nofollow" />
-  <!-- Helps if anything ever accidentally uses http:// -->
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
   <style>
@@ -286,22 +284,19 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // CountAPI config
       const NAMESPACE = "technodemocracy.world";
-      const KEY = "visits"; // change to "visits-v2" if you want a fresh reset
+      const KEY = "visits";
       const BASE = "https://api.countapi.xyz";
-
-      // “Humans” approximation: count max once per 12h per browser.
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
-      // Bump storage keys to avoid older cached values (like 0) poisoning display.
+      // New keys so old cached 0/cooldown won't poison display
       const LS_LAST_HIT = "td_counter_last_hit_v2";
       const LS_LAST_VALUE = "td_counter_last_value_v2";
+      const LS_LOCAL_FALLBACK = "td_counter_local_fallback_v1";
 
       const ls = {
         get(k) { try { return localStorage.getItem(k); } catch { return null; } },
         set(k, v) { try { localStorage.setItem(k, v); } catch {} },
-        del(k) { try { localStorage.removeItem(k); } catch {} }
       };
 
       const format = (n) => {
@@ -319,13 +314,9 @@
       const hitUrl = `${BASE}/hit/${ns}/${key}`;
       const getUrl = `${BASE}/get/${ns}/${key}`;
 
-      // If we have a meaningful cache, show it immediately.
       const cached = Number(ls.get(LS_LAST_VALUE));
-      if (Number.isFinite(cached) && cached > 0) {
-        setDisplay(format(cached));
-      } else {
-        setDisplay("loading…");
-      }
+      if (Number.isFinite(cached) && cached > 0) setDisplay(format(cached));
+      else setDisplay("loading…");
 
       const now = Date.now();
       const lastHit = Number(ls.get(LS_LAST_HIT));
@@ -338,34 +329,19 @@
         try {
           const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
           const data = await res.json().catch(() => null);
-
-          if (!res.ok) {
-            const err = new Error("HTTP " + res.status);
-            err.status = res.status;
-            throw err;
-          }
-
-          // Guard against weird payloads
-          if (!data || typeof data.value === "undefined") {
-            const err = new Error("Bad payload");
-            err.status = 500;
-            throw err;
-          }
-
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          if (!data || typeof data.value === "undefined") throw new Error("Bad payload");
           return data;
         } finally {
           clearTimeout(t);
         }
       };
 
-      const commitValue = (value) => {
-        setDisplay(format(value));
-        if (value > 0) ls.set(LS_LAST_VALUE, String(value));
-      };
-
-      const showBlockedOrOffline = () => {
-        // Don't lie with "0" — show "—" if it can't fetch.
-        setDisplay("—", "Counter unavailable (blocked/offline).");
+      const localFallback = () => {
+        const v0 = Number(ls.get(LS_LOCAL_FALLBACK)) || 0;
+        const v = v0 + 1;
+        ls.set(LS_LOCAL_FALLBACK, String(v));
+        setDisplay(format(v), "Local-only counter (remote blocked/offline).");
       };
 
       (async () => {
@@ -376,7 +352,6 @@
             data = await fetchJson(hitUrl);
             ls.set(LS_LAST_HIT, String(now));
           } else {
-            // cooldown: try get, but if it fails, seed with a hit
             try {
               data = await fetchJson(getUrl);
             } catch {
@@ -387,7 +362,7 @@
 
           let value = Number(data.value);
 
-          // If service returns 0 (common when counter isn't really seeded), seed once.
+          // Seed once if service returns 0
           if (!Number.isFinite(value) || value === 0) {
             const seeded = await fetchJson(hitUrl);
             value = Number(seeded.value);
@@ -395,12 +370,14 @@
           }
 
           if (!Number.isFinite(value)) throw new Error("Bad value");
-          commitValue(value);
+
+          setDisplay(format(value));
+          if (value > 0) ls.set(LS_LAST_VALUE, String(value));
         } catch (e) {
           console.warn("Human counter failed:", e);
           const fallback = Number(ls.get(LS_LAST_VALUE));
-          if (Number.isFinite(fallback) && fallback > 0) commitValue(fallback);
-          else showBlockedOrOffline();
+          if (Number.isFinite(fallback) && fallback > 0) setDisplay(format(fallback), "Counter temporarily unavailable");
+          else localFallback();
         }
       })();
     })();
