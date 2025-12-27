@@ -47,7 +47,6 @@
         0 18px 50px rgba(0, 0, 0, 0.55),
         0 0 0 1px rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(20px);
-      position: relative;
     }
 
     header {
@@ -107,8 +106,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 8px;
-      min-height: 152px;
+      gap: 6px;
     }
 
     .counter-label {
@@ -128,7 +126,6 @@
     .counter-caption {
       font-size: 0.8rem;
       color: var(--text-muted);
-      line-height: 1.45;
     }
 
     .manifesto-card {
@@ -199,111 +196,6 @@
       opacity: 0.9;
     }
 
-    /* ===== Lock overlay ===== */
-    body.locked .shell {
-      filter: blur(6px);
-      transform: scale(0.995);
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .gate {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: radial-gradient(circle at top, rgba(18, 12, 47, 0.82), rgba(5, 8, 22, 0.92));
-      backdrop-filter: blur(10px);
-      z-index: 9999;
-    }
-
-    .gate-card {
-      width: min(720px, 100%);
-      background: radial-gradient(circle at top left, rgba(155, 92, 255, 0.22), transparent 55%),
-                  rgba(8, 10, 35, 0.92);
-      border: 1px solid var(--border-subtle);
-      border-radius: 28px;
-      padding: 22px 22px 18px;
-      box-shadow: 0 18px 60px rgba(0,0,0,0.6);
-    }
-
-    .gate-title {
-      font-size: 0.85rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .gate-quote {
-      font-size: 1.08rem;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
-
-    .gate-quote strong { color: var(--accent); }
-
-    .gate-sub {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 14px;
-      opacity: 0.95;
-    }
-
-    .gate-form {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .gate-input {
-      flex: 1 1 220px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: rgba(4, 7, 30, 0.95);
-      padding: 12px 14px;
-      color: var(--text-main);
-      outline: none;
-      font-size: 0.95rem;
-    }
-
-    .gate-input::placeholder { color: rgba(192, 194, 255, 0.7); }
-
-    .gate-btn {
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      background: rgba(6, 8, 30, 0.9);
-      color: var(--text-main);
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .gate-btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
-    .gate-msg {
-      margin-top: 10px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      min-height: 1.2em;
-    }
-
-    .gate-foot {
-      margin-top: 12px;
-      font-size: 0.75rem;
-      color: rgba(192, 194, 255, 0.75);
-      line-height: 1.5;
-    }
-
     @media (max-width: 640px) {
       .shell { padding: 20px 16px 22px; border-radius: 24px; }
       header { flex-direction: column; align-items: flex-start; }
@@ -313,38 +205,11 @@
     }
   </style>
 
-  <!-- CounterAPI browser client (handles response parsing) -->
-  <script async src="https://cdn.jsdelivr.net/npm/counterapi/dist/counter.browser.min.js"></script>
+  <!-- CounterAPI official JS client via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/counterapi/dist/counter.browser.min.js"></script>
 </head>
 
-<body class="locked">
-  <!-- Lock overlay -->
-  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Enter password">
-    <div class="gate-card">
-      <div class="gate-title">Enter the password</div>
-      <div class="gate-quote">
-        “Truth and <strong>love</strong> must prevail over lies and hatred.”
-        <span style="color: var(--text-muted); font-size: 0.95rem;">— Václav Havel</span>
-      </div>
-      <div class="gate-sub">
-        Symbolic gate: the password is the missing word in the quote.<br>
-        <span style="opacity:0.9;">(Pravda a láska musí zvítězit nad lží a nenávistí.)</span>
-      </div>
-
-      <form id="gate-form" class="gate-form">
-        <input id="gate-password" class="gate-input" type="password" inputmode="text" autocomplete="off"
-               placeholder="Password…" aria-label="Password" />
-        <button id="gate-btn" class="gate-btn" type="submit">Unlock</button>
-      </form>
-
-      <div id="gate-msg" class="gate-msg"></div>
-
-      <div class="gate-foot">
-        Note: GitHub Pages can’t truly protect content (this is symbolic). Each successful unlock claims a Human #.
-      </div>
-    </div>
-  </div>
-
+<body>
   <div class="shell">
     <header>
       <div class="title-group">
@@ -358,14 +223,14 @@
     </header>
 
     <div class="top-row">
-      <section class="counter-card" aria-label="Human number">
+      <section class="counter-card" aria-label="Human counter">
         <div>
-          <div class="counter-label">Your human number</div>
+          <div class="counter-label">Humans who opened this page</div>
           <div class="counter-number" id="human-counter">…</div>
         </div>
         <p class="counter-caption">
-          Claimed on first successful unlock per browser.<br>
-          Total humans now: <span id="human-total">…</span>
+          This is an experimental, approximate counter.
+          In later versions it will become part of a transparent, auditable “human aura” system.
         </p>
       </section>
 
@@ -414,150 +279,79 @@
     </main>
 
     <p class="footer-note">
-      v0.1 · Static prototype. Human # is assigned on successful unlock using a simple public counter service.
-      Future versions can be open source and verifiable.
+      v0.1 · Static prototype. Counter uses a simple external service and is not yet an official,
+      auditable tally. Future versions will be open source and verifiable.
     </p>
   </div>
 
   <script>
     (function () {
-      const PASSWORD = "LOVE";
+      const el = document.getElementById("human-counter");
+      if (!el) return;
 
-      // Storage keys
-      const LS_UNLOCKED = "td_unlocked_v1";
-      const LS_HUMAN_NO = "td_human_number_v1";
+      // ✅ Stable CounterAPI client (V1, no auth)
+      // Docs: create V1 client with namespace; use .get() and .up() :contentReference[oaicite:1]{index=1}
+      if (typeof Counter !== "function") {
+        el.textContent = "—";
+        el.title = "Counter library blocked (CDN)";
+        return;
+      }
 
-      // CounterAPI settings (v1 public counters)
-      const COUNTER_NAMESPACE = "technodemocracy-world";
-      const COUNTER_NAME = "humans"; // rename if you want
+      // Use your actual domain as namespace to avoid collisions.
+      const counterClient = new Counter({
+        version: "v1",
+        namespace: "technodemocracy.world",
+        timeout: 8000,
+        debug: false
+      });
 
-      const gateEl = document.getElementById("gate");
-      const formEl = document.getElementById("gate-form");
-      const passEl = document.getElementById("gate-password");
-      const btnEl = document.getElementById("gate-btn");
-      const msgEl = document.getElementById("gate-msg");
+      // Counter name (you can make it per-page later if you want)
+      const KEY = "opens";
 
-      const yourEl = document.getElementById("human-counter");
-      const totalEl = document.getElementById("human-total");
+      // Count max once per 12h per browser
+      const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
+
+      const LS_LAST_HIT = "td_counter_last_hit_v4";
+      const LS_LAST_VALUE = "td_counter_last_value_v4";
 
       function format(n) {
         try { return new Intl.NumberFormat("en-GB").format(n); }
         catch { return String(n); }
       }
 
-      function setText(el, text) {
-        if (!el) return;
-        el.textContent = text;
+      function setDisplay(value, note) {
+        el.textContent = value;
+        if (note) el.setAttribute("title", note);
       }
 
-      function unlockUI() {
-        document.body.classList.remove("locked");
-        if (gateEl) gateEl.style.display = "none";
-      }
+      // Show cached value immediately
+      const cached = Number(localStorage.getItem(LS_LAST_VALUE));
+      if (Number.isFinite(cached)) setDisplay(format(cached));
+      else setDisplay("…");
 
-      // Set initial display from cache (so it never feels broken)
-      const cachedHuman = Number(localStorage.getItem(LS_HUMAN_NO));
-      if (Number.isFinite(cachedHuman)) setText(yourEl, format(cachedHuman));
-      else setText(yourEl, "…");
+      const now = Date.now();
+      const lastHit = Number(localStorage.getItem(LS_LAST_HIT)) || 0;
+      const shouldHit = (now - lastHit) > HIT_COOLDOWN_MS;
 
-      // Helper: create CounterAPI client (browser lib)
-      function makeClient() {
-        if (typeof Counter !== "function") return null;
-        try {
-          return new Counter({
-            version: "v1",
-            namespace: COUNTER_NAMESPACE,
-            timeout: 7000,
-            debug: false
-          });
-        } catch {
-          return null;
-        }
-      }
+      // Optional: show loading only if no cache
+      if (!Number.isFinite(cached)) setDisplay("loading…");
 
-      async function refreshTotal(client) {
-        if (!client || !totalEl) return;
-        try {
-          const res = await client.get(COUNTER_NAME);
-          const v = Number(res && res.value);
-          setText(totalEl, Number.isFinite(v) ? format(v) : "—");
-        } catch {
-          setText(totalEl, "—");
-        }
-      }
+      const op = shouldHit ? counterClient.up(KEY) : counterClient.get(KEY);
 
-      // On load: if already unlocked, just unlock and refresh total.
-      window.addEventListener("load", async () => {
-        const client = makeClient();
-        await refreshTotal(client);
+      op.then((data) => {
+          const value = Number(data && data.value);
+          if (!Number.isFinite(value)) throw new Error("Bad payload");
 
-        const unlocked = localStorage.getItem(LS_UNLOCKED) === "1";
-        const hasNo = Number.isFinite(Number(localStorage.getItem(LS_HUMAN_NO)));
-
-        if (unlocked && hasNo) {
-          unlockUI();
-          return;
-        }
-
-        // Show gate
-        if (gateEl) gateEl.style.display = "flex";
-        setTimeout(() => passEl && passEl.focus(), 50);
-
-        if (!formEl) return;
-
-        formEl.addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          const pw = (passEl?.value || "").trim().toUpperCase();
-          if (pw !== PASSWORD) {
-            setText(msgEl, "Not quite. Hint: it’s the missing word in the quote 🙂");
-            if (passEl) passEl.select();
-            return;
-          }
-
-          setText(msgEl, "Unlocking…");
-          if (btnEl) btnEl.disabled = true;
-          if (passEl) passEl.disabled = true;
-
-          // If they already have a number (edge case), don't increment again.
-          const existing = Number(localStorage.getItem(LS_HUMAN_NO));
-          if (Number.isFinite(existing)) {
-            localStorage.setItem(LS_UNLOCKED, "1");
-            setText(yourEl, format(existing));
-            unlockUI();
-            await refreshTotal(client);
-            return;
-          }
-
-          // Claim a new Human # by incrementing the counter
-          try {
-            if (!client) throw new Error("Counter client unavailable (CDN blocked?)");
-
-            const res = await client.up(COUNTER_NAME);
-            const v = Number(res && res.value);
-
-            if (!Number.isFinite(v)) throw new Error("Bad counter response");
-
-            localStorage.setItem(LS_HUMAN_NO, String(v));
-            localStorage.setItem(LS_UNLOCKED, "1");
-
-            setText(yourEl, format(v));
-            await refreshTotal(client);
-
-            unlockUI();
-          } catch (err) {
-            // Still unlock (symbolic gate), but no number available
-            localStorage.setItem(LS_UNLOCKED, "1");
-            setText(yourEl, "—");
-            setText(totalEl, "—");
-            setText(msgEl, "Unlocked. (Counter is temporarily unavailable.)");
-            unlockUI();
-          } finally {
-            if (btnEl) btnEl.disabled = false;
-            if (passEl) passEl.disabled = false;
-          }
+          setDisplay(format(value));
+          localStorage.setItem(LS_LAST_VALUE, String(value));
+          if (shouldHit) localStorage.setItem(LS_LAST_HIT, String(now));
+        })
+        .catch((err) => {
+          console.warn("Counter failed:", err);
+          const stillCached = Number(localStorage.getItem(LS_LAST_VALUE));
+          if (Number.isFinite(stillCached)) setDisplay(format(stillCached), "Counter temporarily unavailable");
+          else setDisplay("—", "Counter temporarily unavailable");
         });
-      });
     })();
   </script>
 </body>
