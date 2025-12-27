@@ -285,25 +285,19 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // ✅ CounterAPI (no CDN needed)
       const BASE = "https://api.counterapi.dev/v1";
-
-      // Keep these SIMPLE (letters/numbers only = safest everywhere)
       const NAMESPACE = "technodemocracyworld";
       const KEY = "opens";
 
       // Count max once per 12h per browser
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
-      const LS_LAST_HIT = "td_counter_last_hit_v5";
-      const LS_LAST_VALUE = "td_counter_last_value_v5";
+      // Bump version so old cached "0" is ignored
+      const LS_LAST_HIT = "td_counter_last_hit_v6";
+      const LS_LAST_VALUE = "td_counter_last_value_v6";
 
-      function safeGet(key) {
-        try { return localStorage.getItem(key); } catch { return null; }
-      }
-      function safeSet(key, value) {
-        try { localStorage.setItem(key, value); } catch {}
-      }
+      function safeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+      function safeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
 
       function format(n) {
         try { return new Intl.NumberFormat("en-GB").format(n); }
@@ -335,9 +329,8 @@
       const now = Date.now();
       const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
 
-      // Optional force hit for testing: add ?forcehit=1 to URL
+      // Optional force hit: ?forcehit=1
       const forceHit = new URLSearchParams(location.search).get("forcehit") === "1";
-
       const shouldHit = forceHit || (now - lastHit) > HIT_COOLDOWN_MS;
 
       const url = shouldHit
@@ -346,8 +339,11 @@
 
       fetchJson(url, 8000)
         .then((data) => {
-          const value = Number(data && data.value);
-          if (!Number.isFinite(value)) throw new Error("Bad payload");
+          // ✅ CounterAPI.dev returns "count"
+          const raw = (data && (data.count ?? data.value));
+          const value = Number(raw);
+
+          if (!Number.isFinite(value)) throw new Error("Bad payload: " + JSON.stringify(data));
 
           setDisplay(format(value));
           safeSet(LS_LAST_VALUE, String(value));
