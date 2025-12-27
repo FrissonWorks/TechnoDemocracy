@@ -282,113 +282,125 @@
   </div>
 
   <script>
-    (function () {
+    (() => {
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // Namespace + key for CountAPI
-      // (Keep these stable if you want the count to persist.)
+      // CountAPI config
       const NAMESPACE = "technodemocracy.world";
-      const KEY = "visits";
+      const KEY = "visits"; // change to "visits-v2" if you want a fresh reset
       const BASE = "https://api.countapi.xyz";
 
       // “Humans” approximation: count max once per 12h per browser.
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
-      const LS_LAST_HIT = "td_counter_last_hit_v1";
-      const LS_LAST_VALUE = "td_counter_last_value_v1";
+      // Bump storage keys to avoid older cached values (like 0) poisoning display.
+      const LS_LAST_HIT = "td_counter_last_hit_v2";
+      const LS_LAST_VALUE = "td_counter_last_value_v2";
 
-      function format(n) {
+      const ls = {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+        del(k) { try { localStorage.removeItem(k); } catch {} }
+      };
+
+      const format = (n) => {
         try { return new Intl.NumberFormat("en-GB").format(n); }
         catch { return String(n); }
+      };
+
+      const setDisplay = (text, title) => {
+        el.textContent = text;
+        if (title) el.title = title;
+      };
+
+      const ns = encodeURIComponent(NAMESPACE);
+      const key = encodeURIComponent(KEY);
+      const hitUrl = `${BASE}/hit/${ns}/${key}`;
+      const getUrl = `${BASE}/get/${ns}/${key}`;
+
+      // If we have a meaningful cache, show it immediately.
+      const cached = Number(ls.get(LS_LAST_VALUE));
+      if (Number.isFinite(cached) && cached > 0) {
+        setDisplay(format(cached));
+      } else {
+        setDisplay("loading…");
       }
 
-      function setDisplay(value, note) {
-        el.textContent = value;
-        if (note) el.setAttribute("title", note);
-      }
+      const now = Date.now();
+      const lastHit = Number(ls.get(LS_LAST_HIT));
+      const lastHitValid = Number.isFinite(lastHit) && lastHit > 0 && lastHit <= now;
+      const shouldHit = !lastHitValid || (now - lastHit) > HIT_COOLDOWN_MS;
 
-      async function fetchJson(url, timeoutMs) {
+      const fetchJson = async (url, timeoutMs = 7000) => {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), timeoutMs);
-
         try {
           const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+          const data = await res.json().catch(() => null);
+
           if (!res.ok) {
             const err = new Error("HTTP " + res.status);
             err.status = res.status;
             throw err;
           }
-          return await res.json();
+
+          // Guard against weird payloads
+          if (!data || typeof data.value === "undefined") {
+            const err = new Error("Bad payload");
+            err.status = 500;
+            throw err;
+          }
+
+          return data;
         } finally {
           clearTimeout(t);
         }
-      }
+      };
 
-      // LocalStorage can throw in some privacy modes; keep it safe.
-      function lsGet(key) {
-        try { return localStorage.getItem(key); } catch { return null; }
-      }
-      function lsSet(key, value) {
-        try { localStorage.setItem(key, value); } catch {}
-      }
+      const commitValue = (value) => {
+        setDisplay(format(value));
+        if (value > 0) ls.set(LS_LAST_VALUE, String(value));
+      };
 
-      // Show cached value immediately (avoid “feels broken”).
-      const cachedRaw = lsGet(LS_LAST_VALUE);
-      const cached = Number(cachedRaw);
-
-      // Don't “lock in” a cached 0 forever — treat it like "unknown".
-      if (Number.isFinite(cached) && cached > 0) setDisplay(format(cached));
-      else setDisplay("…");
-
-      const now = Date.now();
-      const lastHit = Number(lsGet(LS_LAST_HIT)) || 0;
-      const shouldHit = (now - lastHit) > HIT_COOLDOWN_MS;
-
-      const ns = encodeURIComponent(NAMESPACE);
-      const key = encodeURIComponent(KEY);
-
-      const getUrl = `${BASE}/get/${ns}/${key}`;
-      const hitUrl = `${BASE}/hit/${ns}/${key}`;
-
-      // If no good cache, show loading state.
-      if (!(Number.isFinite(cached) && cached > 0)) setDisplay("loading…");
+      const showBlockedOrOffline = () => {
+        // Don't lie with "0" — show "—" if it can't fetch.
+        setDisplay("—", "Counter unavailable (blocked/offline).");
+      };
 
       (async () => {
         try {
           let data;
 
           if (shouldHit) {
-            // Normal path: count once per cooldown window.
-            data = await fetchJson(hitUrl, 7000);
-            lsSet(LS_LAST_HIT, String(now));
+            data = await fetchJson(hitUrl);
+            ls.set(LS_LAST_HIT, String(now));
           } else {
-            // Cooldown path: try GET, but if the counter doesn't exist yet (404),
-            // do ONE HIT to create it.
+            // cooldown: try get, but if it fails, seed with a hit
             try {
-              data = await fetchJson(getUrl, 7000);
-            } catch (err) {
-              if (err && err.status === 404) {
-                data = await fetchJson(hitUrl, 7000);
-                lsSet(LS_LAST_HIT, String(now));
-              } else {
-                throw err;
-              }
+              data = await fetchJson(getUrl);
+            } catch {
+              data = await fetchJson(hitUrl);
+              ls.set(LS_LAST_HIT, String(now));
             }
           }
 
-          const value = Number(data && data.value);
-          if (!Number.isFinite(value)) throw new Error("Bad payload");
+          let value = Number(data.value);
 
-          setDisplay(format(value));
-          if (value > 0) lsSet(LS_LAST_VALUE, String(value));
-        } catch (e) {
-          const fallback = Number(lsGet(LS_LAST_VALUE));
-          if (Number.isFinite(fallback) && fallback > 0) {
-            setDisplay(format(fallback), "Counter temporarily unavailable");
-          } else {
-            setDisplay("—", "Counter temporarily unavailable");
+          // If service returns 0 (common when counter isn't really seeded), seed once.
+          if (!Number.isFinite(value) || value === 0) {
+            const seeded = await fetchJson(hitUrl);
+            value = Number(seeded.value);
+            ls.set(LS_LAST_HIT, String(now));
           }
+
+          if (!Number.isFinite(value)) throw new Error("Bad value");
+          commitValue(value);
+        } catch (e) {
+          console.warn("Human counter failed:", e);
+          const fallback = Number(ls.get(LS_LAST_VALUE));
+          if (Number.isFinite(fallback) && fallback > 0) commitValue(fallback);
+          else showBlockedOrOffline();
         }
       })();
     })();
