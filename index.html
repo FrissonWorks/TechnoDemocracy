@@ -4,10 +4,18 @@
   <meta charset="UTF-8" />
   <title>TechnoDemocracy – Early Manifesto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <!-- Hide from search engines for now -->
   <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta name="googlebot" content="noindex, nofollow" />
+
+  <!-- Helps if anything ever accidentally uses http:// -->
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Reduce “old cached HTML” headaches -->
+  <meta http-equiv="Cache-Control" content="no-store, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <style>
     :root {
@@ -285,14 +293,18 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
+      // CounterAPI.dev — no external JS libraries required
       const BASE = "https://api.counterapi.dev/v1";
+
+      // ✅ Keep these simple (letters/numbers only)
+      // If you ever want a “clean launch reset”, change KEY to a new name (e.g. "openslive")
       const NAMESPACE = "technodemocracyworld";
       const KEY = "opens";
 
       // Count max once per 12h per browser
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
-      // Bump version so old cached "0" is ignored
+      // Local cache keys (bump the suffix if you want to ignore old cached values)
       const LS_LAST_HIT = "td_counter_last_hit_v6";
       const LS_LAST_VALUE = "td_counter_last_value_v6";
 
@@ -321,7 +333,7 @@
         }
       }
 
-      // Show cached value immediately
+      // Show cached value immediately (if any)
       const cached = Number(safeGet(LS_LAST_VALUE));
       if (Number.isFinite(cached)) setDisplay(format(cached));
       else setDisplay("loading…");
@@ -329,7 +341,7 @@
       const now = Date.now();
       const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
 
-      // Optional force hit: ?forcehit=1
+      // Optional: force a hit for testing with ?forcehit=1
       const forceHit = new URLSearchParams(location.search).get("forcehit") === "1";
       const shouldHit = forceHit || (now - lastHit) > HIT_COOLDOWN_MS;
 
@@ -339,7 +351,7 @@
 
       fetchJson(url, 8000)
         .then((data) => {
-          // ✅ CounterAPI.dev returns "count"
+          // CounterAPI.dev returns "count" (we also accept "value" as fallback)
           const raw = (data && (data.count ?? data.value));
           const value = Number(raw);
 
