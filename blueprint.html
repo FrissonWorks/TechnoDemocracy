@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TechnoDemocracy – Technical Blueprint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <style>
+    :root {
+      --bg1: #050816;
+      --bg2: #120c2f;
+      --accent: #9b5cff;
+      --accent-soft: rgba(155, 92, 255, 0.2);
+      --text-main: #f9f9ff;
+      --text-muted: #c0c2ff;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --glass: rgba(8, 10, 35, 0.85);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1) 60%);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px;
+      line-height: 1.6;
+    }
+
+    .shell {
+      max-width: 880px;
+      width: 100%;
+      background: var(--glass);
+      border-radius: 24px;
+      padding: 48px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      transition: opacity 0.2s;
+    }
+
+    .nav-link:hover { opacity: 0.7; }
+    .nav-link::before { content: "← "; margin-right: 4px; }
+
+    header { margin-bottom: 48px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 32px; }
+
+    h1 {
+      font-size: 2.2rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: 300; }
+
+    h2 {
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin: 40px 0 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    h3 { font-size: 1.1rem; color: var(--text-main); margin: 24px 0 12px; }
+
+    p { font-size: 1rem; color: var(--text-muted); margin-bottom: 16px; }
+
+    ul, ol { margin-bottom: 24px; padding-left: 24px; color: var(--text-muted); }
+    li { margin-bottom: 8px; }
+    li strong { color: var(--text-main); }
+
+    .callout {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .callout p { margin: 0; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .card h4 { color: var(--text-main); margin-bottom: 12px; }
+    .card ul { margin-bottom: 0; }
+
+    @media (max-width: 640px) {
+      .shell { padding: 32px 24px; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <a href="index.html" class="nav-link">Return to Manifesto</a>
+
+    <header>
+      <h1>TechnoDemocracy v1</h1>
+      <p class="subtitle">Discussion Draft & Technical Blueprint</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Idea:</strong> Treat executive government roles as jobs with clear responsibilities, evidence-based hiring, and regular performance reviews, so citizens don’t hand out a blank cheque for years.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>What it IS</h4>
+          <ul>
+            <li>Democratic oversight + expert execution + auditable performance.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>What it IS NOT</h4>
+          <ul>
+            <li>“Experts rule because they’re experts.” Citizens remain the ultimate boss.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>A) Executive Structure: The "Portfolio Tripod"</h2>
+      <p>For each cabinet portfolio (e.g., Health, Education, Defence, Economy), you have 3 linked roles:</p>
+      <ul>
+        <li><strong>1. Lead Minister (Strategy / Decisions):</strong> Owns the plan, trade-offs, outcomes.</li>
+        <li><strong>2. Deputy Minister (Delivery / Ops):</strong> Owns execution, milestones, delivery health.</li>
+        <li><strong>3. Portfolio Auditor / Public Guardian (Integrity):</strong> Publishes compliance notes, integrity flags, can trigger review. Not allowed to “run policy”; their job is oversight.</li>
+      </ul>
+      <p><em>Succession:</em> If Lead is removed, Deputy becomes Acting Lead until the next review window.</p>
+
+      <h2>B) Selection & Verification Layer</h2>
+      <p>Goal: Filter out fraud/incompetence without creating an untouchable elite. "Scope it right" rule: verify facts + enforce templates + publish evidence. Don’t crown kings.</p>
+      <ol>
+        <li><strong>Open applications:</strong> Every role has a public job spec (scope, constraints, success measures).</li>
+        <li><strong>Verification (narrow powers):</strong> A Verification Commission checks credentials, conflict-of-interest, and enforces a standardized template. It does <em>not</em> pick the winner.</li>
+        <li><strong>Shortlist (optional, but powerful):</strong> A mixed panel (Random Citizens + Domain Reviewers + Auditors) shortlists to 3–6 candidates using a published rubric.</li>
+        <li><strong>Citizen choice:</strong> Citizens choose the best candidates for the roles.</li>
+      </ol>
+
+      <h2>C) The “Cabinet Dashboard”</h2>
+      <p>One public page shows all portfolios with standardized cards:</p>
+      <ul>
+        <li><strong>100-day priorities</strong> (Top 3)</li>
+        <li><strong>3 KPIs</strong> (with caveats + data source)</li>
+        <li><strong>Constraints:</strong> “What I will not do”</li>
+        <li><strong>Three Status Lanes:</strong> Delivery (milestones), Outcomes (results), Integrity (audits).</li>
+        <li><strong>Approval trend:</strong> Shown, but not instantly actionable.</li>
+      </ul>
+
+      <h2>D) Accountability Rhythm: Review Windows</h2>
+      <ul>
+        <li><strong>Quarterly review windows</strong> (recommended default) to provide stability.</li>
+        <li><strong>Two-strike removal rule:</strong> A leader is removed after falling below the approval threshold for 2 consecutive windows.</li>
+        <li><strong>Integrity fast-path:</strong> Immediate removal only for defined integrity breaches (fraud, undisclosed conflicts).</li>
+      </ul>
+
+      <h2>E) Anti-Steamroll Guardrails</h2>
+      <p>Protections against the “51% can push anything” problem:</p>
+      <ul>
+        <li><strong>Supermajority rules</strong> (60–67%) for high-risk categories (elections, constitutional rights).</li>
+        <li><strong>Citizens’ Chamber</strong> (sortition) with limited powers: delay/veto high-risk bills, force evidence briefs.</li>
+        <li><strong>Independent courts</strong> / rights constraints.</li>
+      </ul>
+
+      <h2>Glossary & Core Definitions</h2>
+      <ul>
+        <li><strong>Job Spec:</strong> Public document defining responsibilities, boundaries, reporting duties, and constraints.</li>
+        <li><strong>Candidate Page:</strong> Standardized application format so citizens can compare fairly.</li>
+        <li><strong>KPI (with caveats):</strong> A measurable indicator including data source, confidence note, and known trade-offs.</li>
+        <li><strong>Sortition:</strong> Selecting citizens by lottery to form representative panels. Anti-capture mechanism.</li>
+      </ul>
+
+      <h2>FAQ (For Skeptical Readers)</h2>
+      
+      <h3>1. Isn’t this just technocracy?</h3>
+      <p>No. Citizens retain the power to appoint and remove leaders. Verification informs; it doesn’t rule. Expertise is a job requirement, not a source of ultimate authority.</p>
+
+      <h3>2. Doesn’t this create an elite gatekeeping class?</h3>
+      <p>Only if the verification layer has broad power. In this model it’s narrowly scoped: verify facts + publish evidence + enforce standardized pages, with transparency and appeals.</p>
+
+      <h3>3. Won’t leaders chase popularity instead of doing hard things?</h3>
+      <p>That’s why review windows and stability safeguards exist (quarterly windows, two-strike rule). Approval is visible, but not twitchy.</p>
+
+      <h3>4. Can KPIs be gamed?</h3>
+      <p>Yes—unless designed carefully. KPIs must include caveats, trade-offs, and data quality labels.</p>
+
+      <h3>5. What about long-term policies where results take years?</h3>
+      <p>We separate Delivery (execution) from Outcomes (lagging results), and require decision logs so leaders aren’t punished for responsible long-term choices.</p>
+      
+      <h3>6. Is this anti-party?</h3>
+      <p>No. It’s anti-“party capture of executive competence.” Parties can exist; executive roles are evaluated by performance and integrity, not just coalition bargaining.</p>
+
+    </main>
+  </div>
+</body>
+</html>
