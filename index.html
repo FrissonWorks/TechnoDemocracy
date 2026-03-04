@@ -48,7 +48,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     h1 {
@@ -60,13 +60,30 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .version-badge {
+    /* Counter Styling */
+    .counter-area {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .counter-label {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
       color: var(--accent);
-      margin-bottom: 24px;
+      margin-bottom: 8px;
       display: block;
+    }
+
+    .counter-number {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
     }
 
     .preamble {
@@ -143,8 +160,11 @@
 <body>
   <div class="shell">
     <header>
-      <span class="version-badge">Declaration v0.1</span>
       <h1>TechnoDemocracy</h1>
+      <div class="counter-area">
+        <span class="counter-label">Humans who have entered this vision</span>
+        <div class="counter-number" id="human-counter">loading…</div>
+      </div>
       <p class="preamble">
         Governance must evolve. We envision a new model where expertise and accountability unite to serve humanity’s future—rebalancing power so that decisions are made with the people, for the greater good.
       </p>
@@ -163,7 +183,7 @@
 
       <section class="pillar">
         <h2>The Voice of the People</h2>
-        <p>Tenure is a commitment to service, but it is not a silent one. TechnoDemocracy replaces the divisive nature of party politics with a system where the people’s voice is a constant force. Leaders must act in alignment with the public interest, ensuring that when dissatisfaction arises, the people's concerns are a formal part of the governance record.</p>
+        <p>Tenure is a commitment to service, but it is not a silent one. TechnoDemocracy replaces party-driven conflict with a system where the people’s voice is a constant force. Leaders must act in alignment with the public interest, ensuring that when dissatisfaction arises, it is recorded and addressed as a formal part of the democratic contract.</p>
       </section>
 
       <div class="vision-statement">
@@ -171,7 +191,7 @@
       </div>
 
       <div class="authorship">
-        First proposed by <strong>[Insert Your Name]</strong> on 2 December 2025.
+        First proposed on 9 December 2025.
       </div>
 
       <div class="contact">
@@ -183,5 +203,70 @@
       Licensed under CC BY 4.0. Offered freely to humanity.
     </footer>
   </div>
+
+  <script>
+    (function () {
+      const el = document.getElementById("human-counter");
+      if (!el) return;
+
+      const BASE = "https://api.counterapi.dev/v1";
+      const NAMESPACE = "technodemocracyworld";
+      const KEY = "opens";
+      const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
+      const LS_LAST_HIT = "td_counter_last_hit_v6";
+      const LS_LAST_VALUE = "td_counter_last_value_v6";
+
+      function safeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+      function safeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
+
+      function format(n) {
+        try { return new Intl.NumberFormat("en-GB").format(n); }
+        catch { return String(n); }
+      }
+
+      function setDisplay(value) {
+        el.textContent = value;
+      }
+
+      async function fetchJson(url, timeoutMs) {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return await res.json();
+        } finally {
+          clearTimeout(t);
+        }
+      }
+
+      const cached = Number(safeGet(LS_LAST_VALUE));
+      if (Number.isFinite(cached)) setDisplay(format(cached));
+
+      const now = Date.now();
+      const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
+      const shouldHit = (now - lastHit) > HIT_COOLDOWN_MS;
+
+      const url = shouldHit
+        ? `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}/up`
+        : `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`;
+
+      fetchJson(url, 8000)
+        .then((data) => {
+          const raw = (data && (data.count ?? data.value));
+          const value = Number(raw);
+          if (!Number.isFinite(value)) throw new Error("Bad payload");
+          setDisplay(format(value));
+          safeSet(LS_LAST_VALUE, String(value));
+          if (shouldHit) safeSet(LS_LAST_HIT, String(now));
+        })
+        .catch((err) => {
+          console.warn("Counter failed:", err);
+          const stillCached = Number(safeGet(LS_LAST_VALUE));
+          if (Number.isFinite(stillCached)) setDisplay(format(stillCached));
+          else setDisplay("—");
+        });
+    })();
+  </script>
 </body>
 </html>
