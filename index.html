@@ -2,228 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TechnoDemocracy – Early Manifesto</title>
+  <title>TechnoDemocracy – A Manifesto for Humanity</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="robots" content="noindex, nofollow, noarchive" />
-  <meta name="googlebot" content="noindex, nofollow" />
-
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
   <meta http-equiv="Cache-Control" content="no-store, max-age=0" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
 
   <style>
     :root {
       --bg1: #050816;
       --bg2: #120c2f;
       --accent: #9b5cff;
-      --accent-soft: rgba(155, 92, 255, 0.3);
+      --accent-soft: rgba(155, 92, 255, 0.2);
       --text-main: #f9f9ff;
       --text-muted: #c0c2ff;
-      --card-bg: rgba(8, 10, 35, 0.9);
       --border-subtle: rgba(255, 255, 255, 0.08);
+      --glass: rgba(8, 10, 35, 0.85);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, var(--bg2), var(--bg1) 55%);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1) 60%);
       color: var(--text-main);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 40px 24px;
+      line-height: 1.6;
     }
 
     .shell {
-      max-width: 880px;
+      max-width: 720px;
       width: 100%;
-      background: radial-gradient(circle at top left, var(--accent-soft), transparent 55%),
-                  linear-gradient(135deg, rgba(10, 12, 40, 0.98), rgba(5, 6, 25, 0.98));
-      border-radius: 32px;
-      padding: 28px 24px 32px;
+      background: var(--glass);
+      border-radius: 24px;
+      padding: 48px;
       border: 1px solid var(--border-subtle);
-      box-shadow:
-        0 18px 50px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(255, 255, 255, 0.03);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(20px);
     }
 
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
+      text-align: center;
+      margin-bottom: 48px;
     }
 
-    .title-group h1 {
-      font-size: clamp(1.8rem, 2.4vw + 1rem, 2.6rem);
-      letter-spacing: 0.03em;
+    h1 {
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(to bottom, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .title-group p {
-      margin-top: 4px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .badge {
-      border-radius: 999px;
-      border: 1px solid var(--accent-soft);
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(6, 8, 30, 0.9);
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-    }
-
-    .top-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: stretch;
-      margin-bottom: 18px;
-    }
-
-    .counter-card {
-      flex: 1 1 230px;
-      background: rgba(4, 7, 30, 0.95);
-      border-radius: 24px;
-      padding: 16px 18px;
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .counter-label {
-      font-size: 0.78rem;
+    .version-badge {
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 24px;
+      display: block;
     }
 
-    .counter-number {
-      font-variant-numeric: tabular-nums;
-      font-size: 2.2rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+    .preamble {
+      font-size: 1.15rem;
+      color: var(--text-main);
+      margin-bottom: 40px;
+      font-weight: 300;
     }
 
-    .counter-caption {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .pillar {
+      margin-bottom: 32px;
+      padding-left: 20px;
+      border-left: 2px solid var(--accent-soft);
     }
 
-    .manifesto-card {
-      flex: 2 1 300px;
-      background: var(--card-bg);
-      border-radius: 24px;
-      border: 1px solid var(--border-subtle);
-      padding: 16px 18px;
-      overflow: hidden;
-    }
-
-    .manifesto-card h2 {
-      font-size: 0.95rem;
-      letter-spacing: 0.12em;
+    .pillar h2 {
+      font-size: 1.1rem;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 10px;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 8px;
     }
 
-    .manifesto-lead {
-      font-size: 0.95rem;
-      line-height: 1.6;
+    .pillar p {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .vision-statement {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 1.05rem;
+      font-style: italic;
       color: var(--text-main);
     }
 
-    .manifesto-lead strong { color: var(--accent); }
-
-    main {
-      margin-top: 10px;
-      background: rgba(3, 5, 24, 0.95);
-      border-radius: 24px;
-      border: 1px solid var(--border-subtle);
-      padding: 18px 20px;
-      max-height: 380px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent-soft) transparent;
-    }
-
-    main::-webkit-scrollbar { width: 6px; }
-    main::-webkit-scrollbar-track { background: transparent; }
-    main::-webkit-scrollbar-thumb {
-      background-color: var(--accent-soft);
-      border-radius: 999px;
-    }
-
-    main h3 {
-      font-size: 0.9rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+    .authorship {
+      margin-top: 64px;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 12px;
+      opacity: 0.8;
     }
 
-    main p {
-      font-size: 0.95rem;
-      line-height: 1.7;
-      color: var(--text-main);
-      margin-bottom: 12px;
-    }
+    .authorship strong { color: var(--text-main); }
 
-    main p:last-child { margin-bottom: 0; }
-
-    .contact-area {
+    .contact {
       margin-top: 24px;
-      padding: 0 10px;
     }
 
-    .contact-area a {
+    .contact a {
       color: var(--accent);
       text-decoration: none;
-      font-size: 0.9rem;
-      transition: opacity 0.2s ease;
       font-weight: 500;
+      transition: opacity 0.2s;
     }
 
-    .contact-area a:hover {
-      opacity: 0.7;
-      text-decoration: underline;
-    }
+    .contact a:hover { opacity: 0.7; }
 
-    .footer-note {
-      margin-top: 10px;
-      font-size: 0.75rem;
+    .footer-licensing {
+      margin-top: 40px;
+      font-size: 0.7rem;
       color: var(--text-muted);
-      opacity: 0.9;
+      opacity: 0.5;
     }
 
     @media (max-width: 640px) {
-      .shell { padding: 20px 16px 22px; border-radius: 24px; }
-      header { flex-direction: column; align-items: flex-start; }
-      .badge { align-self: flex-start; }
-      .counter-number { font-size: 1.9rem; }
-      main { max-height: none; }
+      .shell { padding: 32px 24px; }
+      h1 { font-size: 1.8rem; }
     }
   </style>
 </head>
@@ -231,146 +143,45 @@
 <body>
   <div class="shell">
     <header>
-      <div class="title-group">
-        <h1>TechnoDemocracy</h1>
-        <p>A humble manifesto for a kinder, smarter, more participatory future.</p>
-      </div>
-      <div class="badge">
-        <span class="dot"></span>
-        Early universe · v0.1
-      </div>
+      <span class="version-badge">Declaration v0.1</span>
+      <h1>TechnoDemocracy</h1>
+      <p class="preamble">
+        Governance must evolve. We envision a new model where expertise and accountability unite to serve humanity’s future—rebalancing power so that decisions are made with the people, for the greater good.
+      </p>
     </header>
 
-    <div class="top-row">
-      <section class="counter-card" aria-label="Human counter">
-        <div>
-          <div class="counter-label">Humans who opened this page</div>
-          <div class="counter-number" id="human-counter">…</div>
-        </div>
-        <p class="counter-caption">
-          This is an experimental, approximate counter.
-          In later versions it will become part of a transparent, auditable “human aura” system.
-        </p>
+    <main>
+      <section class="pillar">
+        <h2>Expertise with Legitimacy</h2>
+        <p>Leaders are chosen for their proven mastery and competence in specific domains. Governance is professionalized, ensuring state functions are guided by wisdom and evidence rather than ideology or favoritism.</p>
       </section>
 
-      <section class="manifesto-card">
-        <h2>Manifesto · Snapshot</h2>
-        <p class="manifesto-lead">
-          <strong>TechnoDemocracy</strong> is an upgrade to the operating system of human decision-making. 
-          We believe the bottleneck of progress isn't a lack of resources, but a lack of coordination.
-          This page is the first digital heartbeat of that vision.
-        </p>
+      <section class="pillar">
+        <h2>Radical Transparency</h2>
+        <p>Every decision-making path must be evidence-based and verifiable. We eliminate the "black box" of politics, making the mechanics of power open to public scrutiny and measurable by results.</p>
       </section>
-    </div>
 
-    <main aria-label="Manifesto text">
-      <h3>The Initial Signal</h3>
+      <section class="pillar">
+        <h2>The Voice of the People</h2>
+        <p>Tenure is a commitment to service, but it is not a silent one. TechnoDemocracy replaces the divisive nature of party politics with a system where the people’s voice is a constant force. Leaders must act in alignment with the public interest, ensuring that when dissatisfaction arises, the people's concerns are a formal part of the governance record.</p>
+      </section>
 
-      <p>
-        Modern governance is bottlenecked by legacy structures and noise. 
-        TechnoDemocracy seeks to bridge the gap between individual wisdom and collective action 
-        using three core pillars:
-      </p>
+      <div class="vision-statement">
+        "TechnoDemocracy is a professionalized renewal of the democratic contract. It replaces party-driven conflict with evidence-based leadership, ensuring that power always serves the collective wellbeing and the greater good of humanity."
+      </div>
 
-      <p>
-        <strong>1. Synthesized Wisdom:</strong> Using AI not to replace human judgment, but to 
-        organize thousands of complex perspectives into actionable, compassionate policy.
-      </p>
+      <div class="authorship">
+        First proposed by <strong>[Insert Your Name]</strong> on 2 December 2025.
+      </div>
 
-      <p>
-        <strong>2. Verified Participation:</strong> Moving beyond bots and anonymity toward 
-        a "Human Aura" system—where participation is verified, auditable, and inherently human.
-      </p>
-
-      <p>
-        <strong>3. Radical Transparency:</strong> Every decision path, expert panel, and data source 
-        must be open-source and verifiable by the very people it affects. No black boxes.
-      </p>
-
-      <p>
-        This is a journey toward a world where technology is tightly aligned to human 
-        flourishing, not corporate or party interests. 
-        If you are reading this, you are part of the very first wave to encounter the idea. 
-        Thank you for being here at the beginning.
-      </p>
+      <div class="contact">
+        <a href="mailto:Technodemocracy@proton.me">Technodemocracy@proton.me</a>
+      </div>
     </main>
 
-    <div class="contact-area">
-      <a href="mailto:Technodemocracy@proton.me">Technodemocracy@proton.me</a>
-    </div>
-
-    <p class="footer-note">
-      v0.1 · Static prototype. Counter uses a simple external service and is not yet an official,
-      auditable tally. Future versions will be open source and verifiable.
-    </p>
+    <footer class="footer-licensing">
+      Licensed under CC BY 4.0. Offered freely to humanity.
+    </footer>
   </div>
-
-  <script>
-    (function () {
-      const el = document.getElementById("human-counter");
-      if (!el) return;
-
-      const BASE = "https://api.counterapi.dev/v1";
-      const NAMESPACE = "technodemocracyworld";
-      const KEY = "opens";
-      const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
-      const LS_LAST_HIT = "td_counter_last_hit_v6";
-      const LS_LAST_VALUE = "td_counter_last_value_v6";
-
-      function safeGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
-      function safeSet(key, value) { try { localStorage.setItem(key, value); } catch {} }
-
-      function format(n) {
-        try { return new Intl.NumberFormat("en-GB").format(n); }
-        catch { return String(n); }
-      }
-
-      function setDisplay(value, note) {
-        el.textContent = value;
-        if (note) el.setAttribute("title", note);
-      }
-
-      async function fetchJson(url, timeoutMs) {
-        const controller = new AbortController();
-        const t = setTimeout(() => controller.abort(), timeoutMs);
-        try {
-          const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          return await res.json();
-        } finally {
-          clearTimeout(t);
-        }
-      }
-
-      const cached = Number(safeGet(LS_LAST_VALUE));
-      if (Number.isFinite(cached)) setDisplay(format(cached));
-      else setDisplay("loading…");
-
-      const now = Date.now();
-      const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
-      const forceHit = new URLSearchParams(location.search).get("forcehit") === "1";
-      const shouldHit = forceHit || (now - lastHit) > HIT_COOLDOWN_MS;
-
-      const url = shouldHit
-        ? `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}/up`
-        : `${BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`;
-
-      fetchJson(url, 8000)
-        .then((data) => {
-          const raw = (data && (data.count ?? data.value));
-          const value = Number(raw);
-          if (!Number.isFinite(value)) throw new Error("Bad payload");
-          setDisplay(format(value));
-          safeSet(LS_LAST_VALUE, String(value));
-          if (shouldHit) safeSet(LS_LAST_HIT, String(now));
-        })
-        .catch((err) => {
-          console.warn("Counter failed:", err);
-          const stillCached = Number(safeGet(LS_LAST_VALUE));
-          if (Number.isFinite(stillCached)) setDisplay(format(stillCached));
-          else setDisplay("—");
-        });
-    })();
-  </script>
 </body>
 </html>
