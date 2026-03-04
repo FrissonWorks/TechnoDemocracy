@@ -256,44 +256,42 @@
       <section class="manifesto-card">
         <h2>Manifesto · Snapshot</h2>
         <p class="manifesto-lead">
-          <strong>TechnoDemocracy</strong> (working title DDemocracy) is an experiment in
-          rebalancing power: combining people, expertise and technology so that
-          big decisions are made <em>with</em> citizens instead of merely <em>for</em> them.
-          This page is the first public seed of that idea.
+          <strong>TechnoDemocracy</strong> is an upgrade to the operating system of human decision-making. 
+          We believe the bottleneck of progress isn't a lack of resources, but a lack of coordination.
+          This page is the first digital heartbeat of that vision.
         </p>
       </section>
     </div>
 
     <main aria-label="Manifesto text">
-      <h3>Manifesto (preview)</h3>
+      <h3>The Initial Signal</h3>
 
       <p>
-        This is a placeholder for the full manifesto text. For now, TechnoDemocracy
-        lives as a simple promise: that large-scale decisions can be made more
-        intelligently, more compassionately, and with far greater participation
-        than today’s systems allow.
+        Modern governance is bottlenecked by legacy structures and noise. 
+        TechnoDemocracy seeks to bridge the gap between individual wisdom and collective action 
+        using three core pillars:
       </p>
 
       <p>
-        The long-term vision combines:
-        citizens chosen by sortition,
-        transparent data,
-        expert panels,
-        and AI systems that are tightly aligned to human values,
-        not corporate or party interests.
+        <strong>1. Synthesized Wisdom:</strong> Using AI not to replace human judgment, but to 
+        organize thousands of complex perspectives into actionable, compassionate policy.
       </p>
 
       <p>
-        In future iterations, this page will link to:
-        the full manifesto, the governance blueprint, and an open library
-        of questions, critiques and alternative proposals.
-        For now, it is simply a small light on the map saying:
-        “There are better ways to organise ourselves.”
+        <strong>2. Verified Participation:</strong> Moving beyond bots and anonymity toward 
+        a "Human Aura" system—where participation is verified, auditable, and inherently human.
       </p>
 
       <p>
-        If you are reading this, you are part of the very first wave of humans
-        to encounter the idea. Thank you for being here at the beginning.
+        <strong>3. Radical Transparency:</strong> Every decision path, expert panel, and data source 
+        must be open-source and verifiable by the very people it affects. No black boxes.
+      </p>
+
+      <p>
+        This is a journey toward a world where technology is tightly aligned to human 
+        flourishing, not corporate or party interests. 
+        If you are reading this, you are part of the very first wave to encounter the idea. 
+        Thank you for being here at the beginning.
       </p>
     </main>
 
@@ -312,15 +310,10 @@
       const el = document.getElementById("human-counter");
       if (!el) return;
 
-      // CounterAPI.dev — no external JS libraries required
       const BASE = "https://api.counterapi.dev/v1";
-
       const NAMESPACE = "technodemocracyworld";
       const KEY = "opens";
-
-      // Count max once per 12h per browser
       const HIT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
-
       const LS_LAST_HIT = "td_counter_last_hit_v6";
       const LS_LAST_VALUE = "td_counter_last_value_v6";
 
@@ -355,7 +348,6 @@
 
       const now = Date.now();
       const lastHit = Number(safeGet(LS_LAST_HIT)) || 0;
-
       const forceHit = new URLSearchParams(location.search).get("forcehit") === "1";
       const shouldHit = forceHit || (now - lastHit) > HIT_COOLDOWN_MS;
 
@@ -367,9 +359,7 @@
         .then((data) => {
           const raw = (data && (data.count ?? data.value));
           const value = Number(raw);
-
-          if (!Number.isFinite(value)) throw new Error("Bad payload: " + JSON.stringify(data));
-
+          if (!Number.isFinite(value)) throw new Error("Bad payload");
           setDisplay(format(value));
           safeSet(LS_LAST_VALUE, String(value));
           if (shouldHit) safeSet(LS_LAST_HIT, String(now));
@@ -377,8 +367,8 @@
         .catch((err) => {
           console.warn("Counter failed:", err);
           const stillCached = Number(safeGet(LS_LAST_VALUE));
-          if (Number.isFinite(stillCached)) setDisplay(format(stillCached), "Counter temporarily unavailable");
-          else setDisplay("—", "Counter temporarily unavailable");
+          if (Number.isFinite(stillCached)) setDisplay(format(stillCached));
+          else setDisplay("—");
         });
     })();
   </script>
